@@ -1,4 +1,4 @@
-# JavaScript File Uploader
+# 🦄 JavaScript File Uploader
 
 ## Key features
 * Type validation with HTML
