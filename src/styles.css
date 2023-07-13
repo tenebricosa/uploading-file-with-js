@@ -1,0 +1,117 @@
+html {
+  padding: 50px 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  background: radial-gradient(
+          100% 400% at 100% 50%,
+          #ddd 0%,
+          rgb(126, 0, 170) 50%,
+          rgb(0, 35, 162) 100%
+  )
+  right 0% / 400% 100% no-repeat;
+}
+
+label {
+  font-weight: bold;
+}
+
+ul li {
+  text-align: left;
+}
+
+progress {
+  width: 300px;
+  margin: 20px 0 0;
+}
+
+#dropArea {
+  border: 2px dashed transparent;
+  background: #fff;
+  border-radius: 15px;
+  width: 480px;
+  padding: 20px 20px 30px;
+}
+
+#dropArea.highlight {
+  border-color: #007aff;
+}
+
+#app {
+  background: radial-gradient(
+          100% 400% at 100% 50%,
+          rgb(255, 199, 0) 0%,
+          rgb(255, 237, 171) 30%,
+          rgb(255, 237, 171) 50%
+  )
+  right 0% / 400% 100% no-repeat;
+  padding: 20px 30px;
+  border-radius: 15px;
+  width: 620px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+#dropArea {
+  width: 450px;
+  margin: 0 auto;
+
+  background: radial-gradient(
+          100% 400% at 100% 50%,
+          #fff 0%,
+          rgb(233, 171, 255) 40%,
+          rgb(150, 173, 255) 80%
+  )
+  right 0% / 400% 100% no-repeat;
+}
+
+input[type="file"]::file-selector-button {
+  margin: 0 20px 10px 0;
+}
+
+input[type="file"] {
+  color: #999;
+  width: 250px;
+}
+
+button,
+input[type="file"] {
+  display: block;
+  margin: 20px auto;
+  font-size: 16px;
+}
+
+.bold {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+button:disabled,
+button:disabled:hover {
+  background: #ccc;
+  border-color: #777;
+  color: #313131;
+  cursor: auto;
+}
+
+button,
+input[type="file"]::file-selector-button {
+  padding: 8px 16px;
+  background: #000;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid #000;
+  color: #fff;
+}
+
+button:hover,
+input[type="file"]::file-selector-button:hover {
+  background: #313131;
+  transition: all 0.2s ease;
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>How to Upload Files with JavaScript</title>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" type="text/css" href="./src/styles.css">
+</head>
+
+<body>
+<div id="app">
+  <h1>Awesome File Uploader 🦄</h1>
+  <div id="dropArea">
+  <form
+          action="https://httpbin.org/post"
+          enctype="multipart/form-data"
+          method="post"
+  >
+    <p>
+      Drag and Drop Your Files Here<br /><br /><span class="bold">or</span>
+    </p>
+    <input name="file" id="uploaderInput" multiple type="file" accept=".jpg, .png" />
+    <span class="bold">and</span>
+    <button type="submit">Upload</button>
+  </form>
+</div>
+
+<progress id="progressBar" value="0" max="100"></progress>
+
+<p id="status">
+  <label for="statusMessage">Uploading Status:</label>
+  <output id="statusMessage">🤷‍♂ Nothing's Uploaded</output>
+</p>
+
+<p>
+  <label for="fileNum">Uploaded files:</label>
+  <output id="fileNum">0</output>
+</p>
+
+<ul id="fileListMetadata"></ul>
+</div>
+<script src="./src/index.js"></script>
+</body>
+</html>
+
