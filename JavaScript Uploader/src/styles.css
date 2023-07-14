@@ -21,21 +21,39 @@ label {
     font-weight: bold;
 }
 
+ul {
+    list-style-type: none;
+    width: 500px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
 ul li {
     text-align: left;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    line-height: 1.4em;
+    margin: 15px 0;
+    gap: 20px;
+}
+
+ul li span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+ul li::before {
+    content: "📁";
+    position: absolute;
+    left: -21px;
+    top: 1px;
 }
 
 progress {
     width: 300px;
     margin: 20px 0 0;
-}
-
-#dropArea {
-    border: 2px dashed transparent;
-    background: #fff;
-    border-radius: 15px;
-    width: 480px;
-    padding: 20px 20px 30px;
 }
 
 #dropArea.highlight {
@@ -57,8 +75,13 @@ progress {
 }
 
 #dropArea {
-    width: 450px;
     margin: 0 auto;
+
+    border: 2px dashed transparent;
+    background: #fff;
+    border-radius: 15px;
+    width: 500px;
+    padding: 20px 20px 30px;
 
     background: radial-gradient(
             100% 400% at 100% 50%,
@@ -91,7 +114,7 @@ input[type="file"] {
 
 button:disabled,
 button:disabled:hover {
-    background: #ccc;
+    background: #ddd;
     border-color: #777;
     color: #313131;
     cursor: auto;

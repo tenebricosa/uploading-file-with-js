@@ -62,13 +62,11 @@ function handleSubmit(event) {
         if (xhr.status === 200) {
             status.textContent = "✅ Success";
             progressBar.value = 0;
-            submitButton.disabled = false;
 
             getFilesMetadata(uploaderInput.files);
         } else {
             status.textContent = "❌ Error";
             progressBar.value = 0;
-            submitButton.disabled = false;
         }
     };
 
@@ -79,7 +77,6 @@ function handleSubmit(event) {
 function handleDrop(event) {
     event.preventDefault();
     event.stopPropagation();
-    submitButton.disabled = true;
 
     fileListMetadata.textContent = "";
     fileNum.textContent = "0";
@@ -110,13 +107,11 @@ function handleDrop(event) {
             if (xhr.status === 200) {
                 status.textContent = "✅ Success";
                 progressBar.value = 0;
-                submitButton.disabled = false;
 
                 getFilesMetadata(fileList);
             } else {
                 status.textContent = "❌ Error";
                 progressBar.value = 0;
-                submitButton.disabled = false;
             }
         };
 
@@ -133,14 +128,20 @@ function getFilesMetadata(fileList) {
     function renderFileMetadata(name, type, size) {
         return fileListMetadata.insertAdjacentHTML(
             "beforeend",
-            `<li>
-      <label for="fileName">Name: </label>
-      <output id="fileName">${name}</output>
-      <label for="fileType">Type: </label>
-      <output id="fileType">${type}</output>
-      <label for="fileSize">Size: </label>
-      <output id="fileSize">${size} bytes</output>
-    </li>`
+            `
+            <li>
+                <span>
+                    <label for="fileName">Name: </label>
+                    <output id="fileName">${name}</output>
+                </span>
+                <span>
+                <label for="fileType">Type: </label>
+                  <output id="fileType">${type}</output>
+                  <br />
+                  <label for="fileSize">Size: </label>
+                  <output id="fileSize">${size} bytes</output>
+                </span>
+            </li>`
         );
     }
 
@@ -170,7 +171,7 @@ function validateFileSizeOnSubmit(event) {
             fileNum.textContent = "0";
 
             event.target.value = null;
-            submitButton.disabled = false;
+            submitButton.disabled = true;
 
             return false;
         } else if (fileSize > sizeLimit) {
@@ -179,20 +180,19 @@ function validateFileSizeOnSubmit(event) {
             fileNum.textContent = "0";
 
             event.target.value = null;
-            submitButton.disabled = false;
+            submitButton.disabled = true;
 
             return false;
+        } else {
+            console.log("HERE");
+            submitButton.disabled = false;
         }
-
-        submitButton.disabled = false;
     }
 }
 
 function validateFileSizeOnDrop(fileList) {
     const sizeLimit = 1_000_000; // 1 megabyte
     const allowedExtensions = ['jpg', 'png'];
-
-    submitButton.disabled = true;
 
     for (let file of fileList) {
         const {name: fileName, size: fileSize} = file;
@@ -205,7 +205,6 @@ function validateFileSizeOnDrop(fileList) {
             fileNum.textContent = "0";
 
             file = null;
-            submitButton.disabled = false;
 
             return false;
         } else if (fileSize > sizeLimit) {
@@ -214,11 +213,10 @@ function validateFileSizeOnDrop(fileList) {
             fileNum.textContent = "0";
 
             file = null;
-            submitButton.disabled = false;
 
             return false;
         }
     }
-    submitButton.disabled = false;
+
     return true;
 }

@@ -4,8 +4,8 @@
 <head>
     <title>How to Upload Files with JavaScript</title>
     <meta charset="UTF-8"/>
-    <link rel="stylesheet" type="text/css" href="./src/styles.css">
-    <link rel="icon" href="./src/images/favicon-32x32.png" type="image/png">
+    <link rel="stylesheet" type="text/css" href="src/styles.css">
+    <link rel="icon" href="../images/favicon-32x32.png" type="image/png">
 </head>
 
 <body>
@@ -18,19 +18,19 @@
                 method="post"
         >
             <p>
-                Drag and Drop Your Files Here<br/><br/><span class="bold">or</span>
+                Drop files here<br/><br/><span class="bold">or</span>
             </p>
             <input name="file" id="uploaderInput" multiple type="file" accept=".jpg, .png"/>
             <span class="bold">and</span>
-            <button type="submit">Upload</button>
+            <button type="submit" disabled>Upload</button>
         </form>
     </div>
 
     <progress id="progressBar" value="0" max="100"></progress>
 
     <p id="status">
-        <label for="statusMessage">Uploading Status:</label>
-        <output id="statusMessage">🤷‍♂ Nothing's Uploaded</output>
+        <label for="statusMessage">Uploading status:</label>
+        <output id="statusMessage">🤷‍♂ Nothing's uploaded</output>
     </p>
 
     <p>
@@ -40,7 +40,7 @@
 
     <ul id="fileListMetadata"></ul>
 </div>
-<script src="./src/index.js"></script>
+<script src="src/index.js"></script>
 </body>
 </html>
 
