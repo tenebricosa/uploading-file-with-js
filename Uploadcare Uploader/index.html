@@ -6,11 +6,6 @@
     <meta charset="UTF-8"/>
     <link rel="icon" href="../images/favicon-32x32.png" type="image/png">
     <link rel="stylesheet" href="./src/styles.css">
-    <style>
-        .my-config {
-            --cfg-pubkey: "c76afb86b9c735c1c2f9";
-        }
-    </style>
 </head>
 
 <body>
@@ -18,12 +13,22 @@
     <h1>Awesome Uploadcare Blocks 🦄</h1>
 
     <lr-file-uploader-inline
-            css-src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.24.1/web/file-uploader-regular.min.css"
-            class="my-config"
-    ></lr-file-uploader-inline>
+            css-src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks/web/lr-file-uploader-inline.min.css"
+            ctx-name="my-uploader"
+    >
+    </lr-file-uploader-inline>
+
+    <lr-config
+            ctx-name="my-uploader"
+            pubkey="c76afb86b9c735c1c2f9"
+    ></lr-config>
 </div>
-<!--<script type="module" src="./src/index.js"></script>-->
-<script src="https://unpkg.com/@uploadcare/blocks@0.24.1/web/blocks-browser.min.js" type="module"></script>
+
+<script type="module">
+    import * as LR from "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.25.1/web/blocks.min.js";
+
+    LR.registerBlocks(LR);
+</script>
 </body>
 </html>
 

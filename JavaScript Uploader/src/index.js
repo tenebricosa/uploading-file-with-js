@@ -1,15 +1,14 @@
 const form = document.querySelector("form");
 const uploaderInput = document.querySelector("input");
 const submitButton = document.querySelector("button");
-form.addEventListener("submit", handleSubmit);
-
-const dropArea = document.getElementById("dropArea");
-
-const status = document.getElementById("statusMessage");
+const statusMessage = document.getElementById("statusMessage");
 const fileListMetadata = document.getElementById("fileListMetadata");
 const fileNum = document.getElementById("fileNum");
+const dropArea = document.getElementById("dropArea");
 
-uploaderInput.addEventListener("change", validateFileSizeOnSubmit);
+form.addEventListener("submit", handleSubmit);
+
+uploaderInput.addEventListener("change", validateFileOnChange);
 
 ["dragenter", "dragover"].forEach((eventName) => {
     dropArea.addEventListener(eventName, highlight, false);
@@ -41,18 +40,18 @@ function handleSubmit(event) {
 
     fileListMetadata.textContent = "";
     fileNum.textContent = "0";
-    status.textContent = "⏳ Pending...";
+    statusMessage.textContent = "⏳ Pending...";
 
     const form = event.currentTarget;
     const url = new URL(form.action);
     const formMethod = form.method;
     const formData = new FormData(form);
-    const progressBar = document.getElementById("progressBar");
+    const progressBar = document.querySelector("progress");
 
     const xhr = new XMLHttpRequest();
 
     xhr.upload.onprogress = function (event) {
-        status.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
+        statusMessage.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
 
         const percent = (event.loaded / event.total) * 100;
         progressBar.value = Math.round(percent);
@@ -60,12 +59,12 @@ function handleSubmit(event) {
 
     xhr.onloadend = function () {
         if (xhr.status === 200) {
-            status.textContent = "✅ Success";
+            statusMessage.textContent = "✅ Success";
             progressBar.value = 0;
 
             getFilesMetadata(uploaderInput.files);
         } else {
-            status.textContent = "❌ Error";
+            statusMessage.textContent = "❌ Error";
             progressBar.value = 0;
         }
     };
@@ -80,20 +79,20 @@ function handleDrop(event) {
 
     fileListMetadata.textContent = "";
     fileNum.textContent = "0";
-    status.textContent = "⏳ Pending...";
+    statusMessage.textContent = "⏳ Pending...";
 
     const fileList = event.dataTransfer.files;
     const form = event.currentTarget.getElementsByTagName("form")[0];
     const url = new URL(form.action);
     const formMethod = form.method;
-    const progressBar = document.getElementById("progressBar");
+    const progressBar = document.querySelector("progress");
 
-    if (validateFileSizeOnDrop(fileList)) {
+    if (validateFileOnDrop(fileList)) {
         const xhr = new XMLHttpRequest();
         const formData = new FormData()
 
         xhr.upload.onprogress = function (event) {
-            status.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
+            statusMessage.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
 
             const percent = (event.loaded / event.total) * 100;
             progressBar.value = Math.round(percent);
@@ -101,16 +100,16 @@ function handleDrop(event) {
 
         for (const file of fileList) {
             formData.append('file', file)
-        }
+        };
 
         xhr.onloadend = function () {
             if (xhr.status === 200) {
-                status.textContent = "✅ Success";
+                statusMessage.textContent = "✅ Success";
                 progressBar.value = 0;
 
                 getFilesMetadata(fileList);
             } else {
-                status.textContent = "❌ Error";
+                statusMessage.textContent = "❌ Error";
                 progressBar.value = 0;
             }
         };
@@ -124,6 +123,14 @@ function getFilesMetadata(fileList) {
     fileNum.textContent = fileList.length;
 
     fileListMetadata.textContent = "";
+
+    for (const file of fileList) {
+        const name = file.name;
+        const type = file.type;
+        const size = file.size;
+
+        renderFileMetadata(name, type, size);
+    }
 
     function renderFileMetadata(name, type, size) {
         return fileListMetadata.insertAdjacentHTML(
@@ -144,19 +151,11 @@ function getFilesMetadata(fileList) {
             </li>`
         );
     }
-
-    for (const file of fileList) {
-        const name = file.name;
-        const type = file.type;
-        const size = file.size;
-
-        renderFileMetadata(name, type, size);
-    }
 }
 
-function validateFileSizeOnSubmit(event) {
+function validateFileOnChange(event) {
+    const allowedExtensions = ['webp', 'jpeg', 'png'];
     const sizeLimit = 1_000_000; // 1 megabyte
-    const allowedExtensions = ['jpg', 'png'];
 
     submitButton.disabled = true;
 
@@ -166,7 +165,7 @@ function validateFileSizeOnSubmit(event) {
         const fileExtension = fileName.split(".").pop();
 
         if (!allowedExtensions.includes(fileExtension)) {
-            status.textContent = `❌ File "${fileName}" type is not allowed`;
+            statusMessage.textContent = `❌ File "${fileName}" type is not allowed`;
             fileListMetadata.textContent = "";
             fileNum.textContent = "0";
 
@@ -175,7 +174,7 @@ function validateFileSizeOnSubmit(event) {
 
             return false;
         } else if (fileSize > sizeLimit) {
-            status.textContent = `❌ File "${fileName}" is too large`;
+            statusMessage.textContent = `❌ File "${fileName}" is too large`;
             fileListMetadata.textContent = "";
             fileNum.textContent = "0";
 
@@ -184,15 +183,14 @@ function validateFileSizeOnSubmit(event) {
 
             return false;
         } else {
-            console.log("HERE");
             submitButton.disabled = false;
         }
     }
 }
 
-function validateFileSizeOnDrop(fileList) {
+function validateFileOnDrop(fileList) {
+    const allowedExtensions = ['webp', 'jpeg', 'png'];
     const sizeLimit = 1_000_000; // 1 megabyte
-    const allowedExtensions = ['jpg', 'png'];
 
     for (let file of fileList) {
         const {name: fileName, size: fileSize} = file;
@@ -200,7 +198,7 @@ function validateFileSizeOnDrop(fileList) {
         const fileExtension = fileName.split(".").pop();
 
         if (!allowedExtensions.includes(fileExtension)) {
-            status.textContent = `❌ File "${fileName}" type is not allowed`;
+            statusMessage.textContent = `❌ File "${fileName}" type is not allowed`;
             fileListMetadata.textContent = "";
             fileNum.textContent = "0";
 
@@ -208,7 +206,7 @@ function validateFileSizeOnDrop(fileList) {
 
             return false;
         } else if (fileSize > sizeLimit) {
-            status.textContent = `❌ File "${fileName}" is too large`;
+            statusMessage.textContent = `❌ File "${fileName}" is too large`;
             fileListMetadata.textContent = "";
             fileNum.textContent = "0";
 
