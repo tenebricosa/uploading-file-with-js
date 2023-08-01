@@ -14,6 +14,12 @@ uploaderInput.addEventListener('change', event => validateFiles(event.target.fil
   dropArea.addEventListener(eventName, highlight);
 });
 
+['dragleave', 'drop'].forEach((eventName) => {
+  dropArea.addEventListener(eventName, unhighlight);
+});
+
+dropArea.addEventListener('drop', handleDrop);
+
 function highlight(event) {
   event.preventDefault();
   event.stopPropagation();
@@ -21,18 +27,12 @@ function highlight(event) {
   dropArea.classList.add('highlight');
 }
 
-['dragleave', 'drop'].forEach((eventName) => {
-  dropArea.addEventListener(eventName, unhighlight);
-});
-
 function unhighlight(event) {
   event.preventDefault();
   event.stopPropagation();
 
   dropArea.classList.remove('highlight');
 }
-
-dropArea.addEventListener('drop', handleDrop);
 
 function handleSubmit(event) {
   event.preventDefault();
@@ -119,7 +119,7 @@ function validateFiles(fileList) {
   submitButton.disabled = true;
 
   for (const file of fileList) {
-    const {name: fileName, size: fileSize} = file;
+    const { name: fileName, size: fileSize } = file;
 
     if (!allowedTypes.includes(file.type)) {
       statusMessage.textContent = `❌ File "${fileName}" could not be uploaded. Only images with the following extensions are allowed: .webp, .jpeg, .jpg, .png.`;
