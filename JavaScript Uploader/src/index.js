@@ -24,6 +24,7 @@ function handleDrop(event) {
   const fileList = event.dataTransfer.files;
 
   resetFormState();
+  resetFileInput();
 
   try {
     assertFilesValid(fileList);
@@ -128,9 +129,7 @@ function resetFormState() {
   fileNum.textContent = '0';
   statusMessage.textContent = `🤷‍♂ Nothing's uploaded`;
 
-  if (!fileInput.value) {
-    submitButton.disabled = true;
-  }
+  submitButton.disabled = true;
 }
 
 function resetFileInput() {
