@@ -1,5 +1,5 @@
 const form = document.querySelector('form');
-const uploaderInput = document.querySelector('input');
+const fileInput = document.querySelector('input');
 const submitButton = document.querySelector('button');
 const statusMessage = document.getElementById('statusMessage');
 const fileListMetadata = document.getElementById('fileListMetadata');
@@ -8,7 +8,7 @@ const dropArea = document.getElementById('dropArea');
 
 form.addEventListener('submit', handleSubmit);
 
-uploaderInput.addEventListener('change', handleInputChange);
+fileInput.addEventListener('change', handleInputChange);
 
 dropArea.addEventListener('drop', handleDrop);
 
@@ -56,7 +56,7 @@ function handleSubmit(event) {
 
   showPendingState();
 
-  uploadFiles(uploaderInput.files);
+  uploadFiles(fileInput.files);
 
   // TODO: reset uploader input to prevent previously picked files freeze
 }
