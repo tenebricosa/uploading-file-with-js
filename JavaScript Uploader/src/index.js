@@ -18,8 +18,6 @@ function handleSubmit(event) {
   showPendingState();
 
   uploadFiles(fileInput.files);
-
-  // TODO: reset uploader input to prevent previously picked files freeze
 }
 
 function handleDrop(event) {
@@ -35,7 +33,6 @@ function handleDrop(event) {
   }
 
   showPendingState();
-  // TODO: reset uploader input to prevent previously picked files freeze
 
   uploadFiles(fileList);
 }
@@ -75,6 +72,8 @@ function uploadFiles(selectedFiles) {
     } else {
       statusMessage.textContent = '❌ Error';
     }
+
+    resetFileInput();
     progressBar.value = 0;
   });
 
@@ -132,6 +131,10 @@ function resetFormState() {
   if (!fileInput.value) {
     submitButton.disabled = true;
   }
+}
+
+function resetFileInput() {
+  fileInput.value = null;
 }
 
 function initDropAreaHighlightOnDrag() {
