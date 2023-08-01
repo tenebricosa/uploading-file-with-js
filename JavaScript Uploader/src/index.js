@@ -51,7 +51,7 @@ function handleInputChange(event) {
   submitButton.disabled = false;
 }
 
-function uploadFiles(selectedFiles) {
+function uploadFiles(files) {
   const url = 'https://httpbin.org/post';
   const formMethod = 'post';
   const progressBar = document.querySelector('progress');
@@ -69,7 +69,7 @@ function uploadFiles(selectedFiles) {
     if (xhr.status === 200) {
       statusMessage.textContent = '✅ Success';
 
-      renderFilesMetadata(selectedFiles);
+      renderFilesMetadata(files);
     } else {
       statusMessage.textContent = '❌ Error';
     }
@@ -78,8 +78,14 @@ function uploadFiles(selectedFiles) {
     progressBar.value = 0;
   });
 
+  const data = new FormData();
+
+  for (const file of files) {
+    data.append('files[]', file);
+  }
+
   xhr.open(formMethod, url);
-  xhr.send(selectedFiles);
+  xhr.send(data);
 }
 
 function renderFilesMetadata(fileList) {
@@ -106,7 +112,7 @@ function renderFilesMetadata(fileList) {
 
 function assertFilesValid(fileList) {
   const allowedTypes = ['image/webp', 'image/jpeg', 'image/png'];
-  const sizeLimit = 1024 * 1024; // 1 megabyte
+  const sizeLimit = 1024 * 1024 * 1000; // 1 megabyte
 
   for (const file of fileList) {
     const { name: fileName, size: fileSize } = file;
