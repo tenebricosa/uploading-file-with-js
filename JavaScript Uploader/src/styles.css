@@ -17,10 +17,6 @@ body {
     ) right 0% / 400% 100% no-repeat;
 }
 
-label {
-    font-weight: bold;
-}
-
 ul {
     list-style-type: none;
     width: 500px;

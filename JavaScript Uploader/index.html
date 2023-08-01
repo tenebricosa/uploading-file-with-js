@@ -12,15 +12,11 @@
 <div id="app">
     <h1>Awesome JavaScript File Uploader 🦄</h1>
     <div id="dropArea">
-        <form
-                action="https://httpbin.org/post"
-                enctype="multipart/form-data"
-                method="post"
-        >
+        <form>
             <p>
                 Drop files here<br/><br/><span class="bold">or</span>
             </p>
-            <input name="file" id="uploaderInput" multiple type="file" accept=".webp, .jpeg, .png"/>
+            <input name="file" id="uploaderInput" multiple type="file" accept=".webp, .jpeg, .jpg, .png"/>
             <span class="bold">and</span>
             <button type="submit" disabled>Upload</button>
         </form>
@@ -29,13 +25,13 @@
     <progress id="progressBar" value="0" max="100"></progress>
 
     <p>
-        <label for="statusMessage">Uploading status:</label>
-        <output id="statusMessage">🤷‍♂ Nothing's uploaded</output>
+        <strong>Uploading status:</strong>
+        <span id="statusMessage">🤷‍♂ Nothing's uploaded</span>
     </p>
 
     <p>
-        <label for="fileNum">Uploaded files:</label>
-        <output id="fileNum">0</output>
+        <strong>Uploaded files:</strong>
+        <span id="fileNum">0</span>
     </p>
 
     <ul id="fileListMetadata"></ul>

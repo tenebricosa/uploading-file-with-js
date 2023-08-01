@@ -8,10 +8,10 @@ const dropArea = document.getElementById("dropArea");
 
 form.addEventListener("submit", handleSubmit);
 
-uploaderInput.addEventListener("change", validateFileOnChange);
+uploaderInput.addEventListener("change", event => validateFiles(event.target.files));
 
 ["dragenter", "dragover"].forEach((eventName) => {
-    dropArea.addEventListener(eventName, highlight, false);
+    dropArea.addEventListener(eventName, highlight);
 });
 
 function highlight(event) {
@@ -22,7 +22,7 @@ function highlight(event) {
 }
 
 ["dragleave", "drop"].forEach((eventName) => {
-    dropArea.addEventListener(eventName, unhighlight, false);
+    dropArea.addEventListener(eventName, unhighlight);
 });
 
 function unhighlight(event) {
@@ -32,94 +32,65 @@ function unhighlight(event) {
     dropArea.classList.remove("highlight");
 }
 
-dropArea.addEventListener("drop", handleDrop, false);
+dropArea.addEventListener("drop", handleDrop);
 
 function handleSubmit(event) {
     event.preventDefault();
+
+    handleUploadingProcess();
+
+    handleRequest(uploaderInput.files);
+}
+
+function handleDrop(event) {
+    const fileList = event.dataTransfer.files;
+
+    if (!validateFiles(fileList)) {
+        return;
+    }
+
+    handleUploadingProcess();
+
+    handleRequest(fileList);
+}
+
+function handleUploadingProcess() {
     submitButton.disabled = true;
 
     fileListMetadata.textContent = "";
     fileNum.textContent = "0";
     statusMessage.textContent = "⏳ Pending...";
+}
 
-    const form = event.currentTarget;
-    const url = new URL(form.action);
-    const formMethod = form.method;
-    const formData = new FormData(form);
+function handleRequest(selectedFiles) {
+    const url = 'https://httpbin.org/post';
+    const formMethod = 'post';
     const progressBar = document.querySelector("progress");
-
     const xhr = new XMLHttpRequest();
 
-    xhr.upload.onprogress = function (event) {
+    xhr.addEventListener("progress", event => {
         statusMessage.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
 
         const percent = (event.loaded / event.total) * 100;
         progressBar.value = Math.round(percent);
-    };
+    });
 
-    xhr.onloadend = function () {
+    xhr.addEventListener("loadend", () => {
         if (xhr.status === 200) {
             statusMessage.textContent = "✅ Success";
-            progressBar.value = 0;
 
-            getFilesMetadata(uploaderInput.files);
+            renderFilesMetadata(selectedFiles);
         } else {
             statusMessage.textContent = "❌ Error";
-            progressBar.value = 0;
         }
-    };
+        progressBar.value = 0;
+    });
 
     xhr.open(formMethod, url);
-    xhr.send(formData);
+    xhr.send(selectedFiles);
 }
 
-function handleDrop(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    fileListMetadata.textContent = "";
-    fileNum.textContent = "0";
-    statusMessage.textContent = "⏳ Pending...";
-
-    const fileList = event.dataTransfer.files;
-    const form = event.currentTarget.getElementsByTagName("form")[0];
-    const url = new URL(form.action);
-    const formMethod = form.method;
-    const progressBar = document.querySelector("progress");
-
-    if (validateFileOnDrop(fileList)) {
-        const xhr = new XMLHttpRequest();
-        const formData = new FormData()
-
-        xhr.upload.onprogress = function (event) {
-            statusMessage.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
-
-            const percent = (event.loaded / event.total) * 100;
-            progressBar.value = Math.round(percent);
-        };
-
-        for (const file of fileList) {
-            formData.append('file', file)
-        };
-
-        xhr.onloadend = function () {
-            if (xhr.status === 200) {
-                statusMessage.textContent = "✅ Success";
-                progressBar.value = 0;
-
-                getFilesMetadata(fileList);
-            } else {
-                statusMessage.textContent = "❌ Error";
-                progressBar.value = 0;
-            }
-        };
-
-        xhr.open(formMethod, url);
-        xhr.send(formData);
-    }
-}
-
-function getFilesMetadata(fileList) {
+function renderFilesMetadata(fileList) {
     fileNum.textContent = fileList.length;
 
     fileListMetadata.textContent = "";
@@ -129,92 +100,48 @@ function getFilesMetadata(fileList) {
         const type = file.type;
         const size = file.size;
 
-        renderFileMetadata(name, type, size);
-    }
-
-    function renderFileMetadata(name, type, size) {
-        return fileListMetadata.insertAdjacentHTML(
+        fileListMetadata.insertAdjacentHTML(
             "beforeend",
             `
             <li>
-                <span>
-                    <label for="fileName">Name: </label>
-                    <output id="fileName">${name}</output>
-                </span>
-                <span>
-                <label for="fileType">Type: </label>
-                  <output id="fileType">${type}</output>
-                  <br />
-                  <label for="fileSize">Size: </label>
-                  <output id="fileSize">${size} bytes</output>
-                </span>
+                <span><strong>Name:</strong> ${name}</span>
+                <span><strong>Type:</strong> ${type}</span>
+                <span><strong>Size:</strong> ${size} bytes</span>
             </li>`
         );
     }
 }
 
-function validateFileOnChange(event) {
-    const allowedExtensions = ['webp', 'jpeg', 'png'];
-    const sizeLimit = 1_000_000; // 1 megabyte
+function validateFiles(fileList) {
+    const allowedTypes = ['image/webp', 'image/jpeg', 'image/png'];
+    const sizeLimit = 1024 * 1024; // 1 megabyte
 
     submitButton.disabled = true;
 
-    for (const file of event.target.files) {
+    for (const file of fileList) {
         const {name: fileName, size: fileSize} = file;
 
-        const fileExtension = fileName.split(".").pop();
+        if (!allowedTypes.includes(file.type)) {
+            statusMessage.textContent = `❌ File "${fileName}" could not be uploaded. Only images with the following extensions are allowed: .webp, .jpeg, .jpg, .png.`;
+            resetForm(file);
 
-        if (!allowedExtensions.includes(fileExtension)) {
-            statusMessage.textContent = `❌ File "${fileName}" type is not allowed`;
-            fileListMetadata.textContent = "";
-            fileNum.textContent = "0";
-
-            event.target.value = null;
-            submitButton.disabled = true;
-
-            return false;
+            return;
         } else if (fileSize > sizeLimit) {
-            statusMessage.textContent = `❌ File "${fileName}" is too large`;
-            fileListMetadata.textContent = "";
-            fileNum.textContent = "0";
+            statusMessage.textContent = `❌ File "${fileName}" could not be uploaded. Only images up to 1 MB are allowed.`;
+            resetForm(file);
 
-            event.target.value = null;
-            submitButton.disabled = true;
-
-            return false;
-        } else {
-            submitButton.disabled = false;
+            return;
         }
     }
-}
-
-function validateFileOnDrop(fileList) {
-    const allowedExtensions = ['webp', 'jpeg', 'png'];
-    const sizeLimit = 1_000_000; // 1 megabyte
-
-    for (let file of fileList) {
-        const {name: fileName, size: fileSize} = file;
-
-        const fileExtension = fileName.split(".").pop();
-
-        if (!allowedExtensions.includes(fileExtension)) {
-            statusMessage.textContent = `❌ File "${fileName}" type is not allowed`;
-            fileListMetadata.textContent = "";
-            fileNum.textContent = "0";
-
-            file = null;
-
-            return false;
-        } else if (fileSize > sizeLimit) {
-            statusMessage.textContent = `❌ File "${fileName}" is too large`;
-            fileListMetadata.textContent = "";
-            fileNum.textContent = "0";
-
-            file = null;
-
-            return false;
-        }
-    }
+    submitButton.disabled = false;
 
     return true;
+}
+
+function resetForm(file) {
+    fileListMetadata.textContent = "";
+    fileNum.textContent = "0";
+
+    file = null;
+    submitButton.disabled = true;
 }
