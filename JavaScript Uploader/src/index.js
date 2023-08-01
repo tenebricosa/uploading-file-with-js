@@ -10,29 +10,46 @@ form.addEventListener('submit', handleSubmit);
 
 uploaderInput.addEventListener('change', event => validateFiles(event.target.files));
 
-['dragenter', 'dragover'].forEach((eventName) => {
-  dropArea.addEventListener(eventName, highlight);
-});
-
-['dragleave', 'drop'].forEach((eventName) => {
-  dropArea.addEventListener(eventName, unhighlight);
-});
-
 dropArea.addEventListener('drop', handleDrop);
 
-function highlight(event) {
-  event.preventDefault();
-  event.stopPropagation();
+let dragEventCounter = 0;
 
-  dropArea.classList.add('highlight');
-}
+dropArea.addEventListener('dragenter', e => {
+  e.preventDefault();
 
-function unhighlight(event) {
-  event.preventDefault();
-  event.stopPropagation();
+  if (dragEventCounter === 0) {
+    dropArea.classList.add('highlight');
+  }
 
+  dragEventCounter += 1;
+});
+
+dropArea.addEventListener('dragover', e => {
+  e.preventDefault();
+
+  // in case of non triggered dragenter!
+  if (dragEventCounter === 0) {
+    dragEventCounter = 1;
+  }
+});
+
+dropArea.addEventListener('dragleave', e => {
+  e.preventDefault();
+
+  dragEventCounter -= 1;
+
+  if (dragEventCounter <= 0) {
+    dragEventCounter = 0;
+    dropArea.classList.remove('highlight');
+  }
+});
+
+dropArea.addEventListener('drop', e => {
+  e.preventDefault();
+
+  dragEventCounter = 0;
   dropArea.classList.remove('highlight');
-}
+});
 
 function handleSubmit(event) {
   event.preventDefault();
