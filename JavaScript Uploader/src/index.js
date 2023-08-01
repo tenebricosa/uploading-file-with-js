@@ -7,49 +7,10 @@ const fileNum = document.getElementById('fileNum');
 const dropArea = document.getElementById('dropArea');
 
 form.addEventListener('submit', handleSubmit);
-
 fileInput.addEventListener('change', handleInputChange);
-
 dropArea.addEventListener('drop', handleDrop);
 
-let dragEventCounter = 0;
-
-dropArea.addEventListener('dragenter', e => {
-  e.preventDefault();
-
-  if (dragEventCounter === 0) {
-    dropArea.classList.add('highlight');
-  }
-
-  dragEventCounter += 1;
-});
-
-dropArea.addEventListener('dragover', e => {
-  e.preventDefault();
-
-  // in case of non triggered dragenter!
-  if (dragEventCounter === 0) {
-    dragEventCounter = 1;
-  }
-});
-
-dropArea.addEventListener('dragleave', e => {
-  e.preventDefault();
-
-  dragEventCounter -= 1;
-
-  if (dragEventCounter <= 0) {
-    dragEventCounter = 0;
-    dropArea.classList.remove('highlight');
-  }
-});
-
-dropArea.addEventListener('drop', e => {
-  e.preventDefault();
-
-  dragEventCounter = 0;
-  dropArea.classList.remove('highlight');
-});
+initDropAreaHighlightOnDrag();
 
 function handleSubmit(event) {
   event.preventDefault();
@@ -176,4 +137,45 @@ function resetForm(file) {
 
   file = null;
   submitButton.disabled = true;
+}
+
+function initDropAreaHighlightOnDrag() {
+  let dragEventCounter = 0;
+
+  dropArea.addEventListener('dragenter', e => {
+    e.preventDefault();
+
+    if (dragEventCounter === 0) {
+      dropArea.classList.add('highlight');
+    }
+
+    dragEventCounter += 1;
+  });
+
+  dropArea.addEventListener('dragover', e => {
+    e.preventDefault();
+
+    // in case of non triggered dragenter!
+    if (dragEventCounter === 0) {
+      dragEventCounter = 1;
+    }
+  });
+
+  dropArea.addEventListener('dragleave', e => {
+    e.preventDefault();
+
+    dragEventCounter -= 1;
+
+    if (dragEventCounter <= 0) {
+      dragEventCounter = 0;
+      dropArea.classList.remove('highlight');
+    }
+  });
+
+  dropArea.addEventListener('drop', e => {
+    e.preventDefault();
+
+    dragEventCounter = 0;
+    dropArea.classList.remove('highlight');
+  });
 }
