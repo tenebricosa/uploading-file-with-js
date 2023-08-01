@@ -29,7 +29,7 @@ function handleDrop(event) {
   try {
     assertFilesValid(fileList);
   } catch (err) {
-    statusMessage.textContent = err.message;
+    updateStatusMessage(err.message);
     return;
   }
 
@@ -44,7 +44,7 @@ function handleInputChange(event) {
   try {
     assertFilesValid(event.target.files);
   } catch (err) {
-    statusMessage.textContent = err.message;
+    updateStatusMessage(err.message);
     return;
   }
 
@@ -58,7 +58,7 @@ function uploadFiles(files) {
   const xhr = new XMLHttpRequest();
 
   xhr.upload.addEventListener('progress', event => {
-    statusMessage.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
+    updateStatusMessage(`⏳ Uploaded ${event.loaded} bytes of ${event.total}`)
 
     const percent = (event.loaded / event.total) * 100;
     progressBar.value = Math.round(percent);
@@ -66,11 +66,10 @@ function uploadFiles(files) {
 
   xhr.addEventListener('loadend', () => {
     if (xhr.status === 200) {
-      statusMessage.textContent = '✅ Success';
-
+      updateStatusMessage('✅ Success');
       renderFilesMetadata(files);
     } else {
-      statusMessage.textContent = '❌ Error';
+      updateStatusMessage('❌ Error');
     }
 
     resetFileInput();
@@ -124,17 +123,22 @@ function assertFilesValid(fileList) {
   }
 }
 
+function updateStatusMessage(text) {
+  statusMessage.textContent = text;
+}
+
 function showPendingState() {
   submitButton.disabled = true;
-  statusMessage.textContent = '⏳ Pending...';
+  updateStatusMessage('⏳ Pending...')
 }
 
 function resetFormState() {
   fileListMetadata.textContent = '';
   fileNum.textContent = '0';
-  statusMessage.textContent = `🤷‍♂ Nothing's uploaded`;
 
   submitButton.disabled = true;
+
+  updateStatusMessage(`🤷‍♂ Nothing's uploaded`)
 }
 
 function resetFileInput() {
