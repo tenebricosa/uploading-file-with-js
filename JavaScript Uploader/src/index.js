@@ -25,7 +25,7 @@ function handleSubmit(event) {
 function handleDrop(event) {
   const fileList = event.dataTransfer.files;
 
-  resetForm();
+  resetFormState();
 
   try {
     assertFilesValid(fileList);
@@ -41,7 +41,7 @@ function handleDrop(event) {
 }
 
 function handleInputChange(event) {
-  resetForm();
+  resetFormState();
 
   try {
     assertFilesValid(event.target.files);
@@ -124,15 +124,14 @@ function showPendingState() {
   statusMessage.textContent = '⏳ Pending...';
 }
 
-// TODO: replace 'file' with file input
-// TODO: maybe rename using 'State' at the end to match with showPendingState?
-function resetForm(file) {
+function resetFormState() {
   fileListMetadata.textContent = '';
   fileNum.textContent = '0';
   statusMessage.textContent = `🤷‍♂ Nothing's uploaded`;
 
-  file = null;
-  submitButton.disabled = true;
+  if (!fileInput.value) {
+    submitButton.disabled = true;
+  }
 }
 
 function initDropAreaHighlightOnDrag() {
