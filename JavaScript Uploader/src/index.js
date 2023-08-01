@@ -40,6 +40,19 @@ function handleDrop(event) {
   uploadFiles(fileList);
 }
 
+function handleInputChange(event) {
+  resetForm();
+
+  try {
+    assertFilesValid(event.target.files);
+  } catch (err) {
+    statusMessage.textContent = err.message;
+    return;
+  }
+
+  submitButton.disabled = false;
+}
+
 function uploadFiles(selectedFiles) {
   const url = 'https://httpbin.org/post';
   const formMethod = 'post';
@@ -91,19 +104,6 @@ function renderFilesMetadata(fileList) {
   }
 }
 
-function handleInputChange(event) {
-  resetForm();
-
-  try {
-    assertFilesValid(event.target.files);
-  } catch (err) {
-    statusMessage.textContent = err.message;
-    return;
-  }
-
-  submitButton.disabled = false;
-}
-
 function assertFilesValid(fileList) {
   const allowedTypes = ['image/webp', 'image/jpeg', 'image/png'];
   const sizeLimit = 1024 * 1024; // 1 megabyte
@@ -121,10 +121,6 @@ function assertFilesValid(fileList) {
 
 function showPendingState() {
   submitButton.disabled = true;
-
-  // TODO: do we need these two here?
-  fileListMetadata.textContent = '';
-  fileNum.textContent = '0';
   statusMessage.textContent = '⏳ Pending...';
 }
 
