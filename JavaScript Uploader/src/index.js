@@ -11,137 +11,137 @@ form.addEventListener("submit", handleSubmit);
 uploaderInput.addEventListener("change", event => validateFiles(event.target.files));
 
 ["dragenter", "dragover"].forEach((eventName) => {
-    dropArea.addEventListener(eventName, highlight);
+  dropArea.addEventListener(eventName, highlight);
 });
 
 function highlight(event) {
-    event.preventDefault();
-    event.stopPropagation();
+  event.preventDefault();
+  event.stopPropagation();
 
-    dropArea.classList.add("highlight");
+  dropArea.classList.add("highlight");
 }
 
 ["dragleave", "drop"].forEach((eventName) => {
-    dropArea.addEventListener(eventName, unhighlight);
+  dropArea.addEventListener(eventName, unhighlight);
 });
 
 function unhighlight(event) {
-    event.preventDefault();
-    event.stopPropagation();
+  event.preventDefault();
+  event.stopPropagation();
 
-    dropArea.classList.remove("highlight");
+  dropArea.classList.remove("highlight");
 }
 
 dropArea.addEventListener("drop", handleDrop);
 
 function handleSubmit(event) {
-    event.preventDefault();
+  event.preventDefault();
 
-    handleUploadingProcess();
+  handleUploadingProcess();
 
-    handleRequest(uploaderInput.files);
+  handleRequest(uploaderInput.files);
 }
 
 function handleDrop(event) {
-    const fileList = event.dataTransfer.files;
+  const fileList = event.dataTransfer.files;
 
-    if (!validateFiles(fileList)) {
-        return;
-    }
+  if (!validateFiles(fileList)) {
+    return;
+  }
 
-    handleUploadingProcess();
+  handleUploadingProcess();
 
-    handleRequest(fileList);
+  handleRequest(fileList);
 }
 
 function handleUploadingProcess() {
-    submitButton.disabled = true;
+  submitButton.disabled = true;
 
-    fileListMetadata.textContent = "";
-    fileNum.textContent = "0";
-    statusMessage.textContent = "⏳ Pending...";
+  fileListMetadata.textContent = "";
+  fileNum.textContent = "0";
+  statusMessage.textContent = "⏳ Pending...";
 }
 
 function handleRequest(selectedFiles) {
-    const url = 'https://httpbin.org/post';
-    const formMethod = 'post';
-    const progressBar = document.querySelector("progress");
-    const xhr = new XMLHttpRequest();
+  const url = 'https://httpbin.org/post';
+  const formMethod = 'post';
+  const progressBar = document.querySelector("progress");
+  const xhr = new XMLHttpRequest();
 
-    xhr.addEventListener("progress", event => {
-        statusMessage.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
+  xhr.addEventListener("progress", event => {
+    statusMessage.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
 
-        const percent = (event.loaded / event.total) * 100;
-        progressBar.value = Math.round(percent);
-    });
+    const percent = (event.loaded / event.total) * 100;
+    progressBar.value = Math.round(percent);
+  });
 
-    xhr.addEventListener("loadend", () => {
-        if (xhr.status === 200) {
-            statusMessage.textContent = "✅ Success";
+  xhr.addEventListener("loadend", () => {
+    if (xhr.status === 200) {
+      statusMessage.textContent = "✅ Success";
 
-            renderFilesMetadata(selectedFiles);
-        } else {
-            statusMessage.textContent = "❌ Error";
-        }
-        progressBar.value = 0;
-    });
+      renderFilesMetadata(selectedFiles);
+    } else {
+      statusMessage.textContent = "❌ Error";
+    }
+    progressBar.value = 0;
+  });
 
-    xhr.open(formMethod, url);
-    xhr.send(selectedFiles);
+  xhr.open(formMethod, url);
+  xhr.send(selectedFiles);
 }
 
 function renderFilesMetadata(fileList) {
-    fileNum.textContent = fileList.length;
+  fileNum.textContent = fileList.length;
 
-    fileListMetadata.textContent = "";
+  fileListMetadata.textContent = "";
 
-    for (const file of fileList) {
-        const name = file.name;
-        const type = file.type;
-        const size = file.size;
+  for (const file of fileList) {
+    const name = file.name;
+    const type = file.type;
+    const size = file.size;
 
-        fileListMetadata.insertAdjacentHTML(
-            "beforeend",
-            `
-            <li>
-                <span><strong>Name:</strong> ${name}</span>
-                <span><strong>Type:</strong> ${type}</span>
-                <span><strong>Size:</strong> ${size} bytes</span>
-            </li>`
-        );
-    }
+    fileListMetadata.insertAdjacentHTML(
+      "beforeend",
+      `
+        <li>
+          <span><strong>Name:</strong> ${name}</span>
+          <span><strong>Type:</strong> ${type}</span>
+          <span><strong>Size:</strong> ${size} bytes</span>
+        </li>`
+    );
+  }
 }
 
 function validateFiles(fileList) {
-    const allowedTypes = ['image/webp', 'image/jpeg', 'image/png'];
-    const sizeLimit = 1024 * 1024; // 1 megabyte
+  const allowedTypes = ['image/webp', 'image/jpeg', 'image/png'];
+  const sizeLimit = 1024 * 1024; // 1 megabyte
 
-    submitButton.disabled = true;
+  submitButton.disabled = true;
 
-    for (const file of fileList) {
-        const {name: fileName, size: fileSize} = file;
+  for (const file of fileList) {
+    const {name: fileName, size: fileSize} = file;
 
-        if (!allowedTypes.includes(file.type)) {
-            statusMessage.textContent = `❌ File "${fileName}" could not be uploaded. Only images with the following extensions are allowed: .webp, .jpeg, .jpg, .png.`;
-            resetForm(file);
+    if (!allowedTypes.includes(file.type)) {
+      statusMessage.textContent = `❌ File "${fileName}" could not be uploaded. Only images with the following extensions are allowed: .webp, .jpeg, .jpg, .png.`;
+      resetForm(file);
 
-            return;
-        } else if (fileSize > sizeLimit) {
-            statusMessage.textContent = `❌ File "${fileName}" could not be uploaded. Only images up to 1 MB are allowed.`;
-            resetForm(file);
+      return;
+    } else if (fileSize > sizeLimit) {
+      statusMessage.textContent = `❌ File "${fileName}" could not be uploaded. Only images up to 1 MB are allowed.`;
+      resetForm(file);
 
-            return;
-        }
+      return;
     }
-    submitButton.disabled = false;
+  }
+  submitButton.disabled = false;
 
-    return true;
+  return true;
 }
 
 function resetForm(file) {
-    fileListMetadata.textContent = "";
-    fileNum.textContent = "0";
+  fileListMetadata.textContent = "";
+  fileNum.textContent = "0";
 
-    file = null;
-    submitButton.disabled = true;
+  file = null;
+  submitButton.disabled = true;
 }
