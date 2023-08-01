@@ -57,11 +57,10 @@ function uploadFiles(files) {
   const progressBar = document.querySelector('progress');
   const xhr = new XMLHttpRequest();
 
-  xhr.addEventListener('progress', event => {
+  xhr.upload.addEventListener('progress', event => {
     statusMessage.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
 
     const percent = (event.loaded / event.total) * 100;
-    // TODO: check it's working properly
     progressBar.value = Math.round(percent);
   });
 
