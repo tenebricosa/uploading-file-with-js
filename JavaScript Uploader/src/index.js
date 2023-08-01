@@ -54,9 +54,9 @@ dropArea.addEventListener('drop', e => {
 function handleSubmit(event) {
   event.preventDefault();
 
-  handleUploadingProcess();
+  showPendingState();
 
-  handleRequest(uploaderInput.files);
+  uploadFiles(uploaderInput.files);
 }
 
 function handleDrop(event) {
@@ -66,12 +66,12 @@ function handleDrop(event) {
     return;
   }
 
-  handleUploadingProcess();
+  showPendingState();
 
-  handleRequest(fileList);
+  uploadFiles(fileList);
 }
 
-function handleUploadingProcess() {
+function showPendingState() {
   submitButton.disabled = true;
 
   fileListMetadata.textContent = '';
@@ -79,7 +79,7 @@ function handleUploadingProcess() {
   statusMessage.textContent = '⏳ Pending...';
 }
 
-function handleRequest(selectedFiles) {
+function uploadFiles(selectedFiles) {
   const url = 'https://httpbin.org/post';
   const formMethod = 'post';
   const progressBar = document.querySelector('progress');
