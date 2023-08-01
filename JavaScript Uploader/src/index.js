@@ -8,7 +8,7 @@ const dropArea = document.getElementById('dropArea');
 
 form.addEventListener('submit', handleSubmit);
 
-uploaderInput.addEventListener('change', event => validateFiles(event.target.files));
+uploaderInput.addEventListener('change', handleInputChange);
 
 dropArea.addEventListener('drop', handleDrop);
 
@@ -57,26 +57,26 @@ function handleSubmit(event) {
   showPendingState();
 
   uploadFiles(uploaderInput.files);
+
+  // TODO: reset uploader input to prevent previously picked files freeze
 }
 
 function handleDrop(event) {
   const fileList = event.dataTransfer.files;
 
-  if (!validateFiles(fileList)) {
+  resetForm();
+
+  try {
+    assertFilesValid(fileList);
+  } catch (err) {
+    statusMessage.textContent = err.message;
     return;
   }
 
   showPendingState();
+  // TODO: reset uploader input to prevent previously picked files freeze
 
   uploadFiles(fileList);
-}
-
-function showPendingState() {
-  submitButton.disabled = true;
-
-  fileListMetadata.textContent = '';
-  fileNum.textContent = '0';
-  statusMessage.textContent = '⏳ Pending...';
 }
 
 function uploadFiles(selectedFiles) {
@@ -89,6 +89,7 @@ function uploadFiles(selectedFiles) {
     statusMessage.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
 
     const percent = (event.loaded / event.total) * 100;
+    // TODO: check it's working properly
     progressBar.value = Math.round(percent);
   });
 
@@ -129,35 +130,49 @@ function renderFilesMetadata(fileList) {
   }
 }
 
-function validateFiles(fileList) {
+function handleInputChange(event) {
+  resetForm();
+
+  try {
+    assertFilesValid(event.target.files);
+  } catch (err) {
+    statusMessage.textContent = err.message;
+    return;
+  }
+
+  submitButton.disabled = false;
+}
+
+function assertFilesValid(fileList) {
   const allowedTypes = ['image/webp', 'image/jpeg', 'image/png'];
   const sizeLimit = 1024 * 1024; // 1 megabyte
-
-  submitButton.disabled = true;
 
   for (const file of fileList) {
     const { name: fileName, size: fileSize } = file;
 
     if (!allowedTypes.includes(file.type)) {
-      statusMessage.textContent = `❌ File "${fileName}" could not be uploaded. Only images with the following extensions are allowed: .webp, .jpeg, .jpg, .png.`;
-      resetForm(file);
-
-      return;
+      throw new Error(`❌ File "${fileName}" could not be uploaded. Only images with the following extensions are allowed: .webp, .jpeg, .jpg, .png.`);
     } else if (fileSize > sizeLimit) {
-      statusMessage.textContent = `❌ File "${fileName}" could not be uploaded. Only images up to 1 MB are allowed.`;
-      resetForm(file);
-
-      return;
+      throw new Error(`❌ File "${fileName}" could not be uploaded. Only images up to 1 MB are allowed.`);
     }
   }
-  submitButton.disabled = false;
-
-  return true;
 }
 
+function showPendingState() {
+  submitButton.disabled = true;
+
+  // TODO: do we need these two here?
+  fileListMetadata.textContent = '';
+  fileNum.textContent = '0';
+  statusMessage.textContent = '⏳ Pending...';
+}
+
+// TODO: replace 'file' with file input
+// TODO: maybe rename using 'State' at the end to match with showPendingState?
 function resetForm(file) {
   fileListMetadata.textContent = '';
   fileNum.textContent = '0';
+  statusMessage.textContent = `🤷‍♂ Nothing's uploaded`;
 
   file = null;
   submitButton.disabled = true;
