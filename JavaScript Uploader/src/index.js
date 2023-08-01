@@ -1,16 +1,16 @@
-const form = document.querySelector("form");
-const uploaderInput = document.querySelector("input");
-const submitButton = document.querySelector("button");
-const statusMessage = document.getElementById("statusMessage");
-const fileListMetadata = document.getElementById("fileListMetadata");
-const fileNum = document.getElementById("fileNum");
-const dropArea = document.getElementById("dropArea");
+const form = document.querySelector('form');
+const uploaderInput = document.querySelector('input');
+const submitButton = document.querySelector('button');
+const statusMessage = document.getElementById('statusMessage');
+const fileListMetadata = document.getElementById('fileListMetadata');
+const fileNum = document.getElementById('fileNum');
+const dropArea = document.getElementById('dropArea');
 
-form.addEventListener("submit", handleSubmit);
+form.addEventListener('submit', handleSubmit);
 
-uploaderInput.addEventListener("change", event => validateFiles(event.target.files));
+uploaderInput.addEventListener('change', event => validateFiles(event.target.files));
 
-["dragenter", "dragover"].forEach((eventName) => {
+['dragenter', 'dragover'].forEach((eventName) => {
   dropArea.addEventListener(eventName, highlight);
 });
 
@@ -18,10 +18,10 @@ function highlight(event) {
   event.preventDefault();
   event.stopPropagation();
 
-  dropArea.classList.add("highlight");
+  dropArea.classList.add('highlight');
 }
 
-["dragleave", "drop"].forEach((eventName) => {
+['dragleave', 'drop'].forEach((eventName) => {
   dropArea.addEventListener(eventName, unhighlight);
 });
 
@@ -29,10 +29,10 @@ function unhighlight(event) {
   event.preventDefault();
   event.stopPropagation();
 
-  dropArea.classList.remove("highlight");
+  dropArea.classList.remove('highlight');
 }
 
-dropArea.addEventListener("drop", handleDrop);
+dropArea.addEventListener('drop', handleDrop);
 
 function handleSubmit(event) {
   event.preventDefault();
@@ -57,31 +57,31 @@ function handleDrop(event) {
 function handleUploadingProcess() {
   submitButton.disabled = true;
 
-  fileListMetadata.textContent = "";
-  fileNum.textContent = "0";
-  statusMessage.textContent = "⏳ Pending...";
+  fileListMetadata.textContent = '';
+  fileNum.textContent = '0';
+  statusMessage.textContent = '⏳ Pending...';
 }
 
 function handleRequest(selectedFiles) {
   const url = 'https://httpbin.org/post';
   const formMethod = 'post';
-  const progressBar = document.querySelector("progress");
+  const progressBar = document.querySelector('progress');
   const xhr = new XMLHttpRequest();
 
-  xhr.addEventListener("progress", event => {
+  xhr.addEventListener('progress', event => {
     statusMessage.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
 
     const percent = (event.loaded / event.total) * 100;
     progressBar.value = Math.round(percent);
   });
 
-  xhr.addEventListener("loadend", () => {
+  xhr.addEventListener('loadend', () => {
     if (xhr.status === 200) {
-      statusMessage.textContent = "✅ Success";
+      statusMessage.textContent = '✅ Success';
 
       renderFilesMetadata(selectedFiles);
     } else {
-      statusMessage.textContent = "❌ Error";
+      statusMessage.textContent = '❌ Error';
     }
     progressBar.value = 0;
   });
@@ -93,7 +93,7 @@ function handleRequest(selectedFiles) {
 function renderFilesMetadata(fileList) {
   fileNum.textContent = fileList.length;
 
-  fileListMetadata.textContent = "";
+  fileListMetadata.textContent = '';
 
   for (const file of fileList) {
     const name = file.name;
@@ -101,7 +101,7 @@ function renderFilesMetadata(fileList) {
     const size = file.size;
 
     fileListMetadata.insertAdjacentHTML(
-      "beforeend",
+      'beforeend',
       `
         <li>
           <span><strong>Name:</strong> ${name}</span>
@@ -139,8 +139,8 @@ function validateFiles(fileList) {
 }
 
 function resetForm(file) {
-  fileListMetadata.textContent = "";
-  fileNum.textContent = "0";
+  fileListMetadata.textContent = '';
+  fileNum.textContent = '0';
 
   file = null;
   submitButton.disabled = true;
