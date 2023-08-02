@@ -25,7 +25,6 @@ function handleDrop(event) {
   const fileList = event.dataTransfer.files;
 
   resetFormState();
-  resetFileInput();
 
   try {
     assertFilesValid(fileList);
@@ -71,7 +70,6 @@ function uploadFiles(files) {
       updateStatusMessage('❌ Error');
     }
 
-    resetFileInput();
     updateProgressBar(0);
   });
 
@@ -143,10 +141,6 @@ function resetFormState() {
   submitButton.disabled = true;
 
   updateStatusMessage(`🤷‍♂ Nothing's uploaded`)
-}
-
-function resetFileInput() {
-  fileInput.value = null;
 }
 
 function initDropAreaHighlightOnDrag() {
