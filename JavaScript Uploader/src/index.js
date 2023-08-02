@@ -97,9 +97,9 @@ function renderFilesMetadata(fileList) {
       'beforeend',
       `
         <li>
-          <span><strong>Name:</strong> ${name}</span>
-          <span><strong>Type:</strong> ${type}</span>
-          <span><strong>Size:</strong> ${size} bytes</span>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Type:</strong> ${type}</p>
+          <p><strong>Size:</strong> ${size} bytes</p>
         </li>`
     );
   }
@@ -139,7 +139,6 @@ function resetFormState() {
   fileNum.textContent = '0';
 
   submitButton.disabled = true;
-
   updateStatusMessage(`🤷‍♂ Nothing's uploaded`)
 }
 

@@ -34,7 +34,8 @@ ul li {
   gap: 20px;
 }
 
-ul li span {
+ul li p {
+  margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
