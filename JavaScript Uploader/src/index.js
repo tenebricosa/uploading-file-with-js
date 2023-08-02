@@ -76,7 +76,7 @@ function uploadFiles(files) {
   const data = new FormData();
 
   for (const file of files) {
-    data.append('files[]', file);
+    data.append('file', file);
   }
 
   xhr.open(method, url);
@@ -113,8 +113,10 @@ function assertFilesValid(fileList) {
     const { name: fileName, size: fileSize } = file;
 
     if (!allowedTypes.includes(file.type)) {
-      throw new Error(`❌ File "${fileName}" could not be uploaded. Only images with the following extensions are allowed: .webp, .jpeg, .jpg, .png.`);
-    } else if (fileSize > sizeLimit) {
+      throw new Error(`❌ File "${fileName}" could not be uploaded. Only images with the following types are allowed: WEBP, JPEG, PNG.`);
+    }
+
+    if (fileSize > sizeLimit) {
       throw new Error(`❌ File "${fileName}" could not be uploaded. Only images up to 1 MB are allowed.`);
     }
   }
