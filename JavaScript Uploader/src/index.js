@@ -1,147 +1,186 @@
-const form = document.querySelector("form");
-const uploaderInput = document.querySelector("input");
-const submitButton = document.querySelector("button");
-const statusMessage = document.getElementById("statusMessage");
-const fileListMetadata = document.getElementById("fileListMetadata");
-const fileNum = document.getElementById("fileNum");
-const dropArea = document.getElementById("dropArea");
+const form = document.querySelector('form');
+const fileInput = document.querySelector('input');
+const submitButton = document.querySelector('button');
+const statusMessage = document.getElementById('statusMessage');
+const fileListMetadata = document.getElementById('fileListMetadata');
+const fileNum = document.getElementById('fileNum');
+const progressBar = document.querySelector('progress');
+const dropArea = document.getElementById('dropArea');
 
-form.addEventListener("submit", handleSubmit);
+form.addEventListener('submit', handleSubmit);
+fileInput.addEventListener('change', handleInputChange);
+dropArea.addEventListener('drop', handleDrop);
 
-uploaderInput.addEventListener("change", event => validateFiles(event.target.files));
-
-["dragenter", "dragover"].forEach((eventName) => {
-    dropArea.addEventListener(eventName, highlight);
-});
-
-function highlight(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    dropArea.classList.add("highlight");
-}
-
-["dragleave", "drop"].forEach((eventName) => {
-    dropArea.addEventListener(eventName, unhighlight);
-});
-
-function unhighlight(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    dropArea.classList.remove("highlight");
-}
-
-dropArea.addEventListener("drop", handleDrop);
+initDropAreaHighlightOnDrag();
 
 function handleSubmit(event) {
-    event.preventDefault();
+  event.preventDefault();
 
-    handleUploadingProcess();
+  showPendingState();
 
-    handleRequest(uploaderInput.files);
+  uploadFiles(fileInput.files);
 }
 
 function handleDrop(event) {
-    const fileList = event.dataTransfer.files;
+  const fileList = event.dataTransfer.files;
 
-    if (!validateFiles(fileList)) {
-        return;
+  resetFormState();
+
+  try {
+    assertFilesValid(fileList);
+  } catch (err) {
+    updateStatusMessage(err.message);
+    return;
+  }
+
+  showPendingState();
+
+  uploadFiles(fileList);
+}
+
+function handleInputChange(event) {
+  resetFormState();
+
+  try {
+    assertFilesValid(event.target.files);
+  } catch (err) {
+    updateStatusMessage(err.message);
+    return;
+  }
+
+  submitButton.disabled = false;
+}
+
+function uploadFiles(files) {
+  const url = 'https://httpbin.org/post';
+  const method = 'post';
+
+  const xhr = new XMLHttpRequest();
+
+  xhr.upload.addEventListener('progress', event => {
+    updateStatusMessage(`⏳ Uploaded ${event.loaded} bytes of ${event.total}`);
+    updateProgressBar(event.loaded / event.total);
+  });
+
+  xhr.addEventListener('loadend', () => {
+    if (xhr.status === 200) {
+      updateStatusMessage('✅ Success');
+      renderFilesMetadata(files);
+    } else {
+      updateStatusMessage('❌ Error');
     }
 
-    handleUploadingProcess();
+    updateProgressBar(0);
+  });
 
-    handleRequest(fileList);
-}
+  const data = new FormData();
 
-function handleUploadingProcess() {
-    submitButton.disabled = true;
+  for (const file of files) {
+    data.append('file', file);
+  }
 
-    fileListMetadata.textContent = "";
-    fileNum.textContent = "0";
-    statusMessage.textContent = "⏳ Pending...";
-}
-
-function handleRequest(selectedFiles) {
-    const url = 'https://httpbin.org/post';
-    const formMethod = 'post';
-    const progressBar = document.querySelector("progress");
-    const xhr = new XMLHttpRequest();
-
-    xhr.addEventListener("progress", event => {
-        statusMessage.textContent = `⏳ Uploaded ${event.loaded} bytes of ${event.total}`;
-
-        const percent = (event.loaded / event.total) * 100;
-        progressBar.value = Math.round(percent);
-    });
-
-    xhr.addEventListener("loadend", () => {
-        if (xhr.status === 200) {
-            statusMessage.textContent = "✅ Success";
-
-            renderFilesMetadata(selectedFiles);
-        } else {
-            statusMessage.textContent = "❌ Error";
-        }
-        progressBar.value = 0;
-    });
-
-    xhr.open(formMethod, url);
-    xhr.send(selectedFiles);
+  xhr.open(method, url);
+  xhr.send(data);
 }
 
 function renderFilesMetadata(fileList) {
-    fileNum.textContent = fileList.length;
+  fileNum.textContent = fileList.length;
 
-    fileListMetadata.textContent = "";
+  fileListMetadata.textContent = '';
 
-    for (const file of fileList) {
-        const name = file.name;
-        const type = file.type;
-        const size = file.size;
+  for (const file of fileList) {
+    const name = file.name;
+    const type = file.type;
+    const size = file.size;
 
-        fileListMetadata.insertAdjacentHTML(
-            "beforeend",
-            `
-            <li>
-                <span><strong>Name:</strong> ${name}</span>
-                <span><strong>Type:</strong> ${type}</span>
-                <span><strong>Size:</strong> ${size} bytes</span>
-            </li>`
-        );
-    }
+    fileListMetadata.insertAdjacentHTML(
+      'beforeend',
+      `
+        <li>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Type:</strong> ${type}</p>
+          <p><strong>Size:</strong> ${size} bytes</p>
+        </li>`
+    );
+  }
 }
 
-function validateFiles(fileList) {
-    const allowedTypes = ['image/webp', 'image/jpeg', 'image/png'];
-    const sizeLimit = 1024 * 1024; // 1 megabyte
+function assertFilesValid(fileList) {
+  const allowedTypes = ['image/webp', 'image/jpeg', 'image/png'];
+  const sizeLimit = 1024 * 1024; // 1 megabyte
 
-    submitButton.disabled = true;
+  for (const file of fileList) {
+    const { name: fileName, size: fileSize } = file;
 
-    for (const file of fileList) {
-        const {name: fileName, size: fileSize} = file;
-
-        if (!allowedTypes.includes(file.type)) {
-            statusMessage.textContent = `❌ File "${fileName}" could not be uploaded. Only images with the following extensions are allowed: .webp, .jpeg, .jpg, .png.`;
-            resetForm(file);
-
-            return;
-        } else if (fileSize > sizeLimit) {
-            statusMessage.textContent = `❌ File "${fileName}" could not be uploaded. Only images up to 1 MB are allowed.`;
-            resetForm(file);
-
-            return;
-        }
+    if (!allowedTypes.includes(file.type)) {
+      throw new Error(`❌ File "${fileName}" could not be uploaded. Only images with the following types are allowed: WEBP, JPEG, PNG.`);
     }
-    submitButton.disabled = false;
 
-    return true;
+    if (fileSize > sizeLimit) {
+      throw new Error(`❌ File "${fileName}" could not be uploaded. Only images up to 1 MB are allowed.`);
+    }
+  }
 }
 
-function resetForm(file) {
-    fileListMetadata.textContent = "";
-    fileNum.textContent = "0";
+function updateStatusMessage(text) {
+  statusMessage.textContent = text;
+}
 
-    file = null;
-    submitButton.disabled = true;
+function updateProgressBar(value) {
+  const percent = value * 100;
+  progressBar.value = Math.round(percent);
+}
+
+function showPendingState() {
+  submitButton.disabled = true;
+  updateStatusMessage('⏳ Pending...')
+}
+
+function resetFormState() {
+  fileListMetadata.textContent = '';
+  fileNum.textContent = '0';
+
+  submitButton.disabled = true;
+  updateStatusMessage(`🤷‍♂ Nothing's uploaded`)
+}
+
+function initDropAreaHighlightOnDrag() {
+  let dragEventCounter = 0;
+
+  dropArea.addEventListener('dragenter', event => {
+    event.preventDefault();
+
+    if (dragEventCounter === 0) {
+      dropArea.classList.add('highlight');
+    }
+
+    dragEventCounter += 1;
+  });
+
+  dropArea.addEventListener('dragover', event => {
+    event.preventDefault();
+
+    // in case of non triggered dragenter!
+    if (dragEventCounter === 0) {
+      dragEventCounter = 1;
+    }
+  });
+
+  dropArea.addEventListener('dragleave', event => {
+    event.preventDefault();
+
+    dragEventCounter -= 1;
+
+    if (dragEventCounter <= 0) {
+      dragEventCounter = 0;
+      dropArea.classList.remove('highlight');
+    }
+  });
+
+  dropArea.addEventListener('drop', event => {
+    event.preventDefault();
+
+    dragEventCounter = 0;
+    dropArea.classList.remove('highlight');
+  });
 }
