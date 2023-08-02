@@ -152,8 +152,8 @@ function resetFileInput() {
 function initDropAreaHighlightOnDrag() {
   let dragEventCounter = 0;
 
-  dropArea.addEventListener('dragenter', e => {
-    e.preventDefault();
+  dropArea.addEventListener('dragenter', event => {
+    event.preventDefault();
 
     if (dragEventCounter === 0) {
       dropArea.classList.add('highlight');
@@ -162,8 +162,8 @@ function initDropAreaHighlightOnDrag() {
     dragEventCounter += 1;
   });
 
-  dropArea.addEventListener('dragover', e => {
-    e.preventDefault();
+  dropArea.addEventListener('dragover', event => {
+    event.preventDefault();
 
     // in case of non triggered dragenter!
     if (dragEventCounter === 0) {
@@ -171,8 +171,8 @@ function initDropAreaHighlightOnDrag() {
     }
   });
 
-  dropArea.addEventListener('dragleave', e => {
-    e.preventDefault();
+  dropArea.addEventListener('dragleave', event => {
+    event.preventDefault();
 
     dragEventCounter -= 1;
 
@@ -182,8 +182,8 @@ function initDropAreaHighlightOnDrag() {
     }
   });
 
-  dropArea.addEventListener('drop', e => {
-    e.preventDefault();
+  dropArea.addEventListener('drop', event => {
+    event.preventDefault();
 
     dragEventCounter = 0;
     dropArea.classList.remove('highlight');
