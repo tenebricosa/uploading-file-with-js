@@ -4,6 +4,7 @@ const submitButton = document.querySelector('button');
 const statusMessage = document.getElementById('statusMessage');
 const fileListMetadata = document.getElementById('fileListMetadata');
 const fileNum = document.getElementById('fileNum');
+const progressBar = document.querySelector('progress');
 const dropArea = document.getElementById('dropArea');
 
 form.addEventListener('submit', handleSubmit);
@@ -54,7 +55,7 @@ function handleInputChange(event) {
 function uploadFiles(files) {
   const url = 'https://httpbin.org/post';
   const method = 'post';
-  const progressBar = document.querySelector('progress');
+
   const xhr = new XMLHttpRequest();
 
   xhr.upload.addEventListener('progress', event => {
