@@ -59,10 +59,8 @@ function uploadFiles(files) {
   const xhr = new XMLHttpRequest();
 
   xhr.upload.addEventListener('progress', event => {
-    updateStatusMessage(`⏳ Uploaded ${event.loaded} bytes of ${event.total}`)
-
-    const percent = (event.loaded / event.total) * 100;
-    progressBar.value = Math.round(percent);
+    updateStatusMessage(`⏳ Uploaded ${event.loaded} bytes of ${event.total}`);
+    updateProgressBar(event.loaded / event.total);
   });
 
   xhr.addEventListener('loadend', () => {
@@ -74,7 +72,7 @@ function uploadFiles(files) {
     }
 
     resetFileInput();
-    progressBar.value = 0;
+    updateProgressBar(0);
   });
 
   const data = new FormData();
@@ -126,6 +124,11 @@ function assertFilesValid(fileList) {
 
 function updateStatusMessage(text) {
   statusMessage.textContent = text;
+}
+
+function updateProgressBar(value) {
+  const percent = value * 100;
+  progressBar.value = Math.round(percent);
 }
 
 function showPendingState() {
