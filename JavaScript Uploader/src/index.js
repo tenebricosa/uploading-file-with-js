@@ -109,7 +109,7 @@ function renderFilesMetadata(fileList) {
 
 function assertFilesValid(fileList) {
   const allowedTypes = ['image/webp', 'image/jpeg', 'image/png'];
-  const sizeLimit = 1024 * 1024 * 1000; // 1 megabyte
+  const sizeLimit = 1024 * 1024; // 1 megabyte
 
   for (const file of fileList) {
     const { name: fileName, size: fileSize } = file;
