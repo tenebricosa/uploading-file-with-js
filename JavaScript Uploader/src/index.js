@@ -53,7 +53,7 @@ function handleInputChange(event) {
 
 function uploadFiles(files) {
   const url = 'https://httpbin.org/post';
-  const formMethod = 'post';
+  const method = 'post';
   const progressBar = document.querySelector('progress');
   const xhr = new XMLHttpRequest();
 
@@ -82,7 +82,7 @@ function uploadFiles(files) {
     data.append('files[]', file);
   }
 
-  xhr.open(formMethod, url);
+  xhr.open(method, url);
   xhr.send(data);
 }
 
